@@ -2,4 +2,4 @@
 
 This is an improved version of prism-wiki.js in [Prism.js](https://prismjs.com/).
 
-It makes MediaWiki's Template and Parser-functions easier to read.
+Supports detailed syntax highlighting of Template and Parser-functions in MediaWiki's wikitext syntax.
