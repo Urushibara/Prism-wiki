@@ -15,10 +15,52 @@ Prism.languages.wiki = {
 		pattern: /^-{4,}/m,
 		alias: "punctuation",
 	},
-	url: [
-		/ISBN +(?:97[89][ -]?)?(?:\d[ -]?){9}[\dx]\b|(?:PMID|RFC) +\d+/i,
-		/\[\[.+?\]\]|\[.+?\]/,
-	],
+	//url: [
+	//	/ISBN +(?:97[89][ -]?)?(?:\d[ -]?){9}[\dx]\b|(?:PMID|RFC) +\d+/i,
+	//	/\[\[.+?\]\]|\[.+?\]/,
+	//],
+	"internal-link": {
+		pattern: /\[{2}[^\[\]]+?\]{2}/m,
+		inside: {
+			"page-name": {
+				pattern: /(?<=\[\[)([^\[\]\|=]+)?/,
+				alias: "keyword",
+			},
+			braket: {
+				pattern: /(^\[\[|\]\]$)/,
+				alias: "variable",
+			},
+			size: {
+				pattern: /x?\d+?x?\d+([a-z]{2}|%)/,
+				alias: "property",
+			},
+			layout: {
+				pattern: /\b(?:center|left|right|none|thumb|frame)\b/,
+				alias: "property",
+			},
+			punctuation: /\|/,
+			// rest: see below
+		}
+	},
+	"external-link": {
+		pattern: /\[[^\[\]]+\]/m,
+		inside: {
+			url: {
+				pattern: /(?<=\[)([^\s\[\]]+)?/,
+				alias: "keyword",
+			},
+			title: {
+				pattern: /([^\s\[\]]+)/,
+				alias: "string",
+			},
+			braket: {
+				pattern: /(^\[|\]$)/,
+				alias: "variable",
+			},
+			punctuation: /\s/,
+			// rest: see below
+		}
+	},
 	argument: {
 		pattern: /\{{3}[\s\r\n]*[^{}]+?\}{3}/m,
 		inside: {
@@ -38,11 +80,11 @@ Prism.languages.wiki = {
 		pattern: /\{{2}[^|:\r\n]+(?=[:|}])?/m,
 		inside: {
 			"parser-function": {
-				pattern: /(?<={{)#\s*([^0-9{}:|=][^{}:|=]*[^\s{}:|=])?/,
+				pattern: /(?<={{)#([^0-9{}:|=]+)?/,
 				alias: "keyword",
 			},
 			"template-name": {
-				pattern: /(?<={{)\s*([^{}:|=][^{}:|=]*[^\s{}:|=])?/,
+				pattern: /(?<={{)([^{}:|=]+)?/,
 				alias: "property",
 			},
 			punctuation: /^\{\{|[:|]|\}\}/,
@@ -50,12 +92,18 @@ Prism.languages.wiki = {
 		}
 	},
 	"parser-function": {
-		pattern: /#([^\s{}:|=][^{}:|=]*[^\s{}:|=])?/,
+		pattern: /#([^{}:|=][^{}:|=]*[^{}:|=])?/,
 		alias: "keyword",
 	},
 	"template-param-eq": {
-		pattern: /(?<=\|\s*)([^\s{}:|=][^{}:|=]*[^\s{}:|=])?(?=\s*=)/,
-		alias: "string",
+		pattern: /\b([^{}:|=][^{}:|=]*[^{}:|=])?=/,
+		inside: {
+			"param-name" :{
+				pattern: /\b([^{}:|=][^{}:|=]*[^{}:|=])?/,
+				alias: "string",
+			},
+			punctuation: /=/,
+		}
 	},
 	emphasis: {
 		// TODO Multi-line
@@ -100,6 +148,7 @@ Prism.languages.wiki = {
 };
 
 Prism.languages.wiki.argument.inside.rest = Prism.languages.wiki;
+Prism.languages.wiki["internal-link"].inside.rest = Prism.languages.wiki;
 Prism.languages.wiki.template.inside.rest = Prism.languages.wiki;
 
 Prism.languages.wiki = Prism.languages.extend("markup", Prism.languages.wiki);
